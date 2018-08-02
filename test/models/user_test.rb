@@ -2,6 +2,7 @@ require 'test_helper'
 
 class UserTest < ActiveSupport::TestCase
  #L'email doit être présent, unique et être dans un format valide(contenir une "@" et ect..)
+  
   def setup
     @user = User.new( email: "user@example.com")
   end
@@ -9,7 +10,12 @@ class UserTest < ActiveSupport::TestCase
 		test "email should be present" do
     	@user.email = "     "
     	assert_not @user.valid?
-  		end
+  	end
+
+    test "email should not be too long" do
+    @user.email = "a" * 244 + "@example.com"
+    assert_not @user.valid?
+    end
 
   	test "email validation should reject invalid addresses" do
     invalid_addresses = %w[user@example,com user_at_foo.org user.name@example.
@@ -18,13 +24,13 @@ class UserTest < ActiveSupport::TestCase
       @user.email = invalid_address
       assert_not @user.valid?, "#{invalid_address.inspect} should be invalid"
       end
-    end
-
+    end  
+    
    test "email addresses should be unique" do
     duplicate_user = @user.dup
     duplicate_user.email = @user.email.upcase
     @user.save
     assert_not duplicate_user.valid?
     end
-   
+ 
 end
